@@ -95,6 +95,12 @@ header.site nav a:hover { color: var(--text); }
 
 .badge.coming { background: var(--card); color: var(--muted); cursor: default; }
 
+.pricing-note {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 12px;
+}
+
 /* Screenshot slider — shows at most 3 images on desktop, 1 on phones */
 .slider-wrap {
   position: relative;
