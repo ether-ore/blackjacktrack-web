@@ -181,6 +181,10 @@ header.site nav a:hover { color: var(--text); }
   font-size: 0.95rem;
 }
 
+.feature a {
+  color: var(--accent);
+}
+
 /* Content pages */
 main.page {
   padding: 48px 0 64px;
