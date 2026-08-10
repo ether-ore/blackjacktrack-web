@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How EV Is Estimated — BlackjackTrack</title>
+  <meta name="description" content="The full methodology behind BlackjackTrack's expected-value numbers: published house-edge values, how the counting estimate works, and how much to trust it.">
+  <link rel="canonical" href="https://ether-ore.github.io/blackjacktrack-web/methodology.html">
+  <meta name="apple-itunes-app" content="app-id=6792820601">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="How BlackjackTrack Estimates EV">
+  <meta property="og:description" content="Published house-edge values, the counting-advantage model, and honest error bars. See the math before you buy.">
+  <meta property="og:image" content="https://ether-ore.github.io/blackjacktrack-web/assets/og-card.png">
+  <meta property="og:url" content="https://ether-ore.github.io/blackjacktrack-web/methodology.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site">
+    <div class="container">
+      <img src="assets/icon.png" alt="BlackjackTrack icon">
+      <span class="name">BlackjackTrack</span>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="support.html">Support</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page container">
+    <h1>How EV Is Estimated</h1>
+    <p class="updated">The same methodology page that ships inside the app — published here so you can judge the math before you pay for it.</p>
+
+    <h2>The formula</h2>
+    <p><code>Hourly EV = hands/hour × average bet × net edge</code></p>
+    <p>Net edge is your counting advantage minus the house edge for the table's rules. Session EV multiplies hourly EV by the hours you logged.</p>
+
+    <h2>House edge — published values</h2>
+    <p>The baseline is a 6-deck, S17, DAS, no-surrender, 3:2 game at 0.40% house edge. Rule adjustments use the published effects from the <a href="https://wizardofodds.com/games/blackjack/rule-variations/">Wizard of Odds rule-variation tables</a>:</p>
+    <ul>
+      <li>Dealer hits soft 17 (H17): +0.22%</li>
+      <li>No double after split: +0.14%</li>
+      <li>Late surrender offered: −0.08%</li>
+      <li>Blackjack pays 6:5: +1.39%</li>
+      <li>Blackjack pays even money: +2.27%</li>
+      <li>Single deck (vs 6): −0.46% · Double deck (vs 6): −0.17% · 8 decks (vs 6): +0.02%</li>
+    </ul>
+    <p>For a basic-strategy player who isn't counting, expected loss is simply the house edge times money through the table — this part of the math is accurate to a few hundredths of a percent.</p>
+
+    <h2>Counting advantage — an estimate</h2>
+    <p>When a counting system is selected, the model adds advantage that scales with the system's betting correlation and the size of your bet spread (logarithmically — going from 1-8 to 1-16 helps less than going from flat to 1-8). Further adjustments:</p>
+    <ul>
+      <li><strong>Penetration</strong> scales the edge relative to a 75% baseline — deeper is better</li>
+      <li><strong>CSM</strong> sets counting advantage to zero — the count never develops</li>
+      <li><strong>Wong in/out</strong> raises per-hand edge roughly 40% and halves hands played</li>
+      <li><strong>Average bet</strong> assumes about 30% of hands are played at elevated counts</li>
+    </ul>
+
+    <h2>Hands per hour</h2>
+    <p>Estimated from game type and table crowding: roughly 200 hands/hour heads-up at a shoe game down to ~55 at a full seven-player table. You can override with actual hands played on any session.</p>
+
+    <h2>The variance band</h2>
+    <p>The shaded band in the EV vs Actual report is ±1 standard deviation, using the standard blackjack figure of about 1.15 × your average bet per hand, scaled by the square root of hands played. Roughly two out of three outcomes should land inside it.</p>
+
+    <h2>How much to trust it</h2>
+    <p>House-edge math is precise. <strong>Counting EV is an estimate — treat it as roughly ±30%.</strong> Real results depend on your exact bet ramp, count frequencies, and conditions, which only full simulation software can model. Use the EV numbers comparatively — 3:2 vs 6:5, hand-shuffle vs CSM, deep vs shallow penetration — rather than as a paycheck forecast. Your actual results over hundreds of hours are the real measurement.</p>
+    <p>Every <em>actual</em> dollar figure in the app is exact arithmetic on the sessions you logged — no estimation anywhere. $/hour is total P/L divided by total hours for whatever is being grouped.</p>
+  </main>
+
+  <footer class="site">
+    <div class="container">
+      <p><a href="index.html">Home</a> · <a href="privacy.html">Privacy Policy</a> · <a href="support.html">Support</a> · <a href="mailto:blackjack_wonk@proton.me">blackjack_wonk@proton.me</a></p>
+    </div>
+  </footer>
+</body>
+</html>
