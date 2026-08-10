@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ether-ore.github.io/blackjacktrack-web/sitemap.xml
+Sitemap: https://blackjacktrack.com/sitemap.xml
