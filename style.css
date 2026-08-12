@@ -200,7 +200,8 @@ header.site nav a:hover { color: var(--text); }
 
 /* Content pages */
 main.page {
-  padding: 48px 0 64px;
+  padding-top: 48px;
+  padding-bottom: 64px;
 }
 
 main.page h1 { margin-bottom: 8px; }
