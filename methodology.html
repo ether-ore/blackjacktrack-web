@@ -62,7 +62,8 @@
     <p>Estimated from game type and table crowding: roughly 200 hands/hour heads-up at a shoe game down to ~55 at a full seven-player table. You can override with actual hands played on any session.</p>
 
     <h2>The variance band</h2>
-    <p>The shaded band in the EV vs Actual report is ±1 standard deviation, using the standard blackjack figure of about 1.15 × your average bet per hand, scaled by the square root of hands played. Roughly two out of three outcomes should land inside it.</p>
+    <p>The shaded band in the EV vs Actual report is ±1 standard deviation, scaled by the square root of hands played. Flat betting runs about 1.15 × your average bet per hand. Bet spreading adds variance beyond what the larger average bet captures: a 1-12 play-all spread runs closer to 1.34 × average bet (variance ≈ 1.80), per Don Schlesinger's <em>Blackjack Attack</em> figures. Roughly two out of three outcomes should land inside the band.</p>
+    <p class="updated">Version note: app version 1.0.1 applies the flat-bet 1.15 figure to all play, which makes the band too narrow for spread play. Version 1.0.2 scales the band with your logged spread using the figures above. Thanks to Don Schlesinger for the correction.</p>
 
     <h2>How much to trust it</h2>
     <p>House-edge math is precise. <strong>Counting EV is an estimate — treat it as roughly ±30%.</strong> Real results depend on your exact bet ramp, count frequencies, and conditions, which only full simulation software can model. Use the EV numbers comparatively — 3:2 vs 6:5, hand-shuffle vs CSM, deep vs shallow penetration — rather than as a paycheck forecast. Your actual results over hundreds of hours are the real measurement.</p>
