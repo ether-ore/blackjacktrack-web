@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>How EV Is Estimated — BlackjackTrack</title>
-  <meta name="description" content="The full methodology behind BlackjackTrack's expected-value numbers: published house-edge values, how the counting estimate works, and how much to trust it.">
+  <title>How EV Is Calculated — BlackjackTrack</title>
+  <meta name="description" content="The full methodology behind BlackjackTrack's expected-value numbers: simulation-backed per-true-count tables, published house-edge values, and honest error bars.">
   <link rel="canonical" href="https://blackjacktrack.com/methodology.html">
   <meta name="apple-itunes-app" content="app-id=6792820601">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="How BlackjackTrack Estimates EV">
-  <meta property="og:description" content="Published house-edge values, the counting-advantage model, and honest error bars. See the math before you buy.">
+  <meta property="og:title" content="How BlackjackTrack Calculates EV">
+  <meta property="og:description" content="Billion-round simulation tables, per-true-count EV and variance, published rule effects, and honest error bars. See the math before you buy.">
   <meta property="og:image" content="https://blackjacktrack.com/assets/og-card.png">
   <meta property="og:url" content="https://blackjacktrack.com/methodology.html">
   <meta name="twitter:card" content="summary_large_image">
@@ -30,15 +30,39 @@
   </header>
 
   <main class="page container">
-    <h1>How EV Is Estimated</h1>
-    <p class="updated">The same methodology page that ships inside the app — published here so you can judge the math before you pay for it.</p>
+    <h1>How EV Is Calculated</h1>
+    <p class="updated">The same methodology page that ships inside the app — published here so you can judge the math before you pay for it. This page describes version 1.0.3; versions 1.0–1.0.2 used the rule-based estimate alone, described further down.</p>
 
     <h2>The formula</h2>
-    <p><code>Hourly EV = hands/hour × average bet × net edge</code></p>
-    <p>Net edge is your counting advantage minus the house edge for the table's rules. Session EV multiplies hourly EV by the hours you logged.</p>
+    <p><code>EV/round = Σ freq(TC) × bet(TC) × edge(TC)</code></p>
+    <p>For most configurations the app sums, true count by true count, how often each count occurs, what you bet there, and the simulated player edge there. The variance band comes from the same per-count distribution, so spread play is priced by the bets you actually make at each count — the average of your <em>squared</em> bets — not an average-bet shortcut. Session EV multiplies the per-round figure by rounds played.</p>
 
-    <h2>House edge — published values</h2>
-    <p>The baseline is a 6-deck, S17, DAS, no-surrender, 3:2 game at 0.40% house edge. Rule adjustments use the published effects from the <a href="https://wizardofodds.com/games/blackjack/rule-variations/">Wizard of Odds rule-variation tables</a>:</p>
+    <h2>Where the tables come from</h2>
+    <p>BlackjackTrack's expectation tables are produced by the Blackjack-Wonk simulation engine: one billion rounds per table configuration, fixed-seed xoshiro256ss shuffling, with per-table provenance (engine commit and simulation hash) embedded in every published table. The same engine lineage reproduced the published expectation values of Don Schlesinger's <em>Blackjack Attack</em> (3rd ed.) Chapter 10 within +0.005 to +0.019 percentage points across four 20-billion-round tables, under conventions confirmed by Schlesinger — see <a href="https://blackjack-wonk.com/How+We+Get+Our+Chapter+10+Numbers">“How We Get Our Chapter 10 Numbers”</a> and <a href="https://blackjack-wonk.com/What+Your+Answers+Changed">“What Your Answers Changed”</a> at blackjack-wonk.com. Those agreement runs used totals-only basic strategy and the book's table conventions; the ramp tables use composition-aware basic strategy, heads-up, as stated in each table's basis block. Two documented approximations apply: the 16v9/16vT surrender-versus-stand-index precedence is a recorded judgment call whose alternative reading is unmeasured in magnitude but bounded by the largest residual (≤0.02 pp); and a split-cap fallback defect disclosed with the archived Chapter 10 runs (worst case a few thousandths of a point) was fixed on 2026-09-06 and does not apply to the ramp tables, which were generated on the post-fix engine.</p>
+    <p class="updated">Thanks to Don Schlesinger, whose comments prompted the move from a heuristic spread model to these tables.</p>
+
+    <h2>What is sim-backed</h2>
+    <ul>
+      <li><strong>Decks:</strong> 1, 2, 6, and 8</li>
+      <li><strong>Counting curves:</strong> Hi-Lo with the Illustrious 18</li>
+      <li><strong>Basic strategy:</strong> per-count curves, no deviations</li>
+      <li><strong>Penetration:</strong> interpolated across 65–85% on the 6-deck ladders</li>
+      <li><strong>Wonging (6-deck):</strong> a dedicated observer-path simulation, expectation per played round, with the sim-measured 30.6% in-action rate</li>
+    </ul>
+    <p>Sim EV is main-bet expectation per initial bet; insurance is excluded. Cut-card dealing is included — that is why the baseline 6-deck basic-strategy cost reads 0.42%, slightly above the no-cut-card 0.40% reference figure. The app labels each session's expectation <em>Sim tables</em> or <em>Rule-based estimate</em> so you always know which model priced it.</p>
+
+    <h2>Labeled approximations</h2>
+    <ul>
+      <li><strong>Other counting systems</strong> use the Hi-Lo curves with the counting gain scaled by the system's betting correlation.</li>
+      <li><strong>Rules that differ from the sim arm</strong> (say, 6:5 payout) are shifted by the published Wizard of Odds effects.</li>
+      <li><strong>Your bet ramp</strong> is modeled as minimum bet through TC +1, rising linearly to your maximum by TC +6.</li>
+      <li><strong>3–5 and 7 decks, and CSMs,</strong> fall back to the rule-based estimate — no sim table applies.</li>
+    </ul>
+    <p>Single-deck expectation below TC 0 uses measured buckets directly; adjacent-bucket structure there reflects the depth mix behind each bucket under half-deck true-count quantization, not sampling noise, and should not be smoothed or interpolated across. The positive-TC ladder — where the bet schedule operates — is clean.</p>
+    <p>The wonging table is measured on a two-seat observer configuration in which the counter tracks every exposed card — dealer reveals during sat-out rounds included; its per-count expectations agree with the play-all table at TC +2 and above, and its TC +1 row reflects entry-threshold conditioning, as disclosed in the table's provenance notes.</p>
+
+    <h2>House edge — published values (the rule-based estimate)</h2>
+    <p>The House Edge figure shown in the app is the rule-based reference, and it also prices rule differences between your table and the nearest sim arm. It is what versions 1.0–1.0.2 used exclusively. The baseline is a 6-deck, S17, DAS, no-surrender, 3:2 game at 0.40% house edge, adjusted by the published effects from the <a href="https://wizardofodds.com/games/blackjack/rule-variations/">Wizard of Odds rule-variation tables</a>:</p>
     <ul>
       <li>Dealer hits soft 17 (H17): +0.22%</li>
       <li>No double after split: +0.14%</li>
@@ -47,26 +71,15 @@
       <li>Blackjack pays even money: +2.27%</li>
       <li>Single deck (vs 6): −0.46% · Double deck (vs 6): −0.17% · 8 decks (vs 6): +0.02%</li>
     </ul>
-    <p>For a basic-strategy player who isn't counting, expected loss is simply the house edge times money through the table — this part of the math is accurate to a few hundredths of a percent.</p>
-
-    <h2>Counting advantage — an estimate</h2>
-    <p>When a counting system is selected, the model adds advantage that scales with the system's betting correlation and the size of your bet spread (logarithmically — going from 1-8 to 1-16 helps less than going from flat to 1-8). Further adjustments:</p>
-    <ul>
-      <li><strong>Penetration</strong> scales the edge relative to a 75% baseline — deeper is better</li>
-      <li><strong>CSM</strong> sets counting advantage to zero — the count never develops</li>
-      <li><strong>Wong in/out</strong> raises per-hand edge roughly 40% and halves hands played</li>
-      <li><strong>Average bet</strong> assumes about 30% of hands are played at elevated counts</li>
-    </ul>
 
     <h2>Hands per hour</h2>
-    <p>Estimated from game type and table crowding: roughly 200 hands/hour heads-up at a shoe game down to ~55 at a full seven-player table. You can override with actual hands played on any session.</p>
+    <p>Estimated from game type and table crowding: roughly 200 hands/hour heads-up at a shoe game down to ~55 at a full seven-player table. Wonging plays the sim-measured 30.6% of dealt rounds. You can override with actual hands played on any session.</p>
 
     <h2>The variance band</h2>
-    <p>The shaded band in the EV vs Actual report is ±1 standard deviation, scaled by the square root of hands played, using the flat-bet figure of about 1.15 × bet per hand. That figure is exact for flat betting only — true spread-play variance depends on the average of your <em>squared</em> bets, which a single flat-bet constant can't capture. For spread play, both the EV line and the band should be read as rough: the current model approximates bet sizes from your logged spread rather than modeling a true bet ramp, which tends to overstate both. Roughly two out of three outcomes should land inside the band for flat play; for spread play, treat it as indicative.</p>
-    <p class="updated">A per-true-count bet-ramp model — deriving the EV line and the variance band from the same bet distribution — is planned for a future update. Thanks to Don Schlesinger for prompting a closer look at the variance treatment for spread play.</p>
+    <p>The shaded band in the EV vs Actual report is ±1 standard deviation, scaled by the square root of rounds played. On the sim-backed path the per-round SD is the exact mixture across true counts — within-count variance plus the spread of per-count expectations — computed from the same tables as the EV line. On the rule-based fallback it is the flat-bet figure of about 1.15 × bet, which the simulations independently confirm at ~1.13–1.14 for flat play. Roughly two out of three outcomes should land inside the band.</p>
 
     <h2>How much to trust it</h2>
-    <p>House-edge math is precise. <strong>Counting EV is an estimate — treat it as roughly ±30%.</strong> Real results depend on your exact bet ramp, count frequencies, and conditions, which only full simulation software can model. Use the EV numbers comparatively — 3:2 vs 6:5, hand-shuffle vs CSM, deep vs shallow penetration — rather than as a paycheck forecast. Your actual results over hundreds of hours are the real measurement.</p>
+    <p>Sim-backed figures inherit the tables' billion-round precision, then lose some to the labeled approximations above — your real bet ramp, system, and conditions never match a sim arm exactly. <strong>Rule-based estimates are rougher: treat those as ±30%.</strong> Either way, use EV comparatively — 3:2 vs 6:5, hand-shuffle vs CSM, deep vs shallow penetration — rather than as a paycheck forecast. Your actual results over hundreds of hours are the real measurement.</p>
     <p>Every <em>actual</em> dollar figure in the app is exact arithmetic on the sessions you logged — no estimation anywhere. $/hour is total P/L divided by total hours for whatever is being grouped.</p>
   </main>
 
